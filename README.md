@@ -1,4 +1,13 @@
-# Multi-Container App Deployment with Docker, Kubernetes & GitHub Actions
+# Multi-Container App with Docker, Kubernetes & GitHub Actions
+
+![Docker](https://img.shields.io/badge/docker-ready-blue?logo=docker)
+![Kubernetes](https://img.shields.io/badge/kubernetes-deployable-blue?logo=kubernetes)
+![GitHub Actions](https://img.shields.io/badge/CI-CD-blue?logo=githubactions)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Python](https://img.shields.io/badge/python-3.x-blue?logo=python)
+![Status](https://img.shields.io/badge/status-active-brightgreen)
+
+> Tags: `docker` · `kubernetes` · `github-actions` · `flask` · `nginx` · `multi-container` · `devops` · `portfolio`
 
 This project demonstrates a simple **multi-container web application** consisting of a **backend (Python Flask)** and a **frontend (Nginx + static HTML)**. It supports both **Docker Compose** for local development and **Kubernetes deployment** using a CI/CD workflow powered by GitHub Actions and [`act`](https://github.com/nektos/act) for local execution.
 
@@ -120,3 +129,19 @@ These will be passed into GitHub Actions when run via `act` using:
 ```bash
 --secret-file .env
 ```
+
+---
+
+## 🧰 Useful Aliases
+
+Add this to your `.zshrc` for quick tree view:
+
+```bash
+alias tre="tree -a -L 2"
+```
+
+---
+
+## 📝 License
+
+MIT — feel free to modify and adapt.
