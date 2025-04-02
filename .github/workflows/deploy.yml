@@ -1,0 +1,78 @@
+name: Deploy to orbStack (Local)
+
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform (build, destroy)'
+        required: true
+        default: 'build'
+      version:
+        description: 'Image version tag (e.g. 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+env:
+  IMAGE_TAG: ${{ github.event.inputs.version }}
+
+jobs:
+  k8s:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout source code
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Optional: Authenticate to Docker registry
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    # Install kubectl CLI
+    - name: Install kubectl
+      run: |
+        curl -LO "https://dl.k8s.io/release/v1.29.0/bin/linux/amd64/kubectl"
+        chmod +x kubectl
+        mv kubectl /usr/local/bin/
+
+    # Check Kubernetes context and cluster connectivity
+    - name: Show kubeconfig and cluster info
+      run: |
+        echo "Using KUBECONFIG from /root/.kube/config"
+        kubectl config current-context || echo "Context not set"
+        kubectl get nodes || echo "Failed to connect to cluster"
+
+    # ------------------ BUILD STEPS ------------------
+    - name: Build Backend Image
+      if: ${{ github.event.inputs.action == 'build' }}
+      run: docker build -t pkonieczny321/multi-container-app-backend:${{ env.IMAGE_TAG }} ./backend
+
+    - name: Build Frontend Image
+      if: ${{ github.event.inputs.action == 'build' }}
+      run: docker build -t pkonieczny321/multi-container-app-frontend:${{ env.IMAGE_TAG }} ./frontend
+
+    - name: Push Backend Image
+      if: ${{ github.event.inputs.action == 'build' }}
+      run: docker push pkonieczny321/multi-container-app-backend:${{ env.IMAGE_TAG }}
+
+    - name: Push Frontend Image
+      if: ${{ github.event.inputs.action == 'build' }}
+      run: docker push pkonieczny321/multi-container-app-frontend:${{ env.IMAGE_TAG }}
+
+    - name: Deploy app to Kubernetes
+      if: ${{ github.event.inputs.action == 'build' }}
+      run: kubectl apply -f k8s/
+
+    # ------------------ DESTROY STEPS ------------------
+    - name: Check resources before destroy
+      if: ${{ github.event.inputs.action == 'destroy' }}
+      run: kubectl get all
+
+    - name: Destroy app in Kubernetes
+      if: ${{ github.event.inputs.action == 'destroy' }}
+      run: kubectl delete -f k8s/ || echo "Resources not found or already deleted"
+
+    - name: Check resources after destroy
+      if: ${{ github.event.inputs.action == 'destroy' }}
+      run: kubectl get all
