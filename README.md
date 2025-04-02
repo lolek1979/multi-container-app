@@ -129,19 +129,3 @@ These will be passed into GitHub Actions when run via `act` using:
 ```bash
 --secret-file .env
 ```
-
----
-
-## 🧰 Useful Aliases
-
-Add this to your `.zshrc` for quick tree view:
-
-```bash
-alias tre="tree -a -L 2"
-```
-
----
-
-## 📝 License
-
-MIT — feel free to modify and adapt.
